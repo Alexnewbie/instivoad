@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drive-Thru Admin Panel</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+    input, select, button {
+      margin-bottom: 12px;
+      padding: 8px;
+      width: 100%;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Drive-Thru Admin Panel</h1>
+  
+  <!-- Form to Add Ads -->
+  <h3>Add Advertisement</h3>
+  <label for="adId">Ad Decal ID</label>
+  <input type="text" id="adId" placeholder="Enter Roblox Decal ID">
+  
+  <label for="adDuration">Duration (Days)</label>
+  <select id="adDuration">
+    <option value="1">1 Day</option>
+    <option value="7">1 Week</option>
+    <option value="30">1 Month</option>
+  </select>
+  
+  <button onclick="addAd()">Add Advertisement</button>
+  
+  <!-- Button to Show White Screen -->
+  <h3>Override Options</h3>
+  <button onclick="setWhiteScreen(true)">Show White Screen</button>
+  <button onclick="setWhiteScreen(false)">Show Menu</button>
+  
+  <!-- Firebase Initialization -->
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAH1fVNuYfGPVSlKllof8QQCgoWJituKUA",
+      authDomain: "instivoads.firebaseapp.com",
+      databaseURL: "https://instivoads-default-rtdb.firebaseio.com",
+      projectId: "instivoads",
+      storageBucket: "instivoads.appspot.com",
+      messagingSenderId: "1072152056306",
+      appId: "1:1072152056306:web:616d192cc6f2a652dc1b6b",
+      measurementId: "G-22XJXN28SV"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Menu ID (Constant)
+    const MENU_ID = "rbxassetid://104762631889784";
+
+    // Set the menu ID on startup
+    db.ref("driveThru/menu").set(MENU_ID);
+
+    // Add Advertisement
+    function addAd() {
+      const adId = document.getElementById("adId").value;
+      const adDuration = parseInt(document.getElementById("adDuration").value);
+      
+      if (!adId) {
+        alert("Please enter an Ad Decal ID!");
+        return;
+      }
+
+      const currentDate = new Date();
+      const expiryDate = currentDate.getTime() + adDuration * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+
+      db.ref("driveThru/ads").push({
+        id: adId,
+        duration: adDuration,
+        expiresAt: expiryDate
+      }).then(() => {
+        alert("Ad added successfully!");
+      }).catch((error) => {
+        console
